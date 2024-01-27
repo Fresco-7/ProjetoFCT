@@ -1,0 +1,79 @@
+{% extends 'base.html' %} {% block main %}
+{% block css %} <style>
+  .span-required {
+    font-size: 12px;
+    margin: 3px 0 0 1px;
+    color: red;
+    display: none;
+  }
+</style>
+{% endblock %}
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">Editar Turma '{{turmaEditar.descricao}}'</h1>
+  <div class="d-flex justify-content-center">
+    <form action="{{url_for('views.editar_turma', id=id)}}" method="post" class="form-inline" id="form">
+      <div class="form-group mx-sm-3 mb-2">
+        <input name="turma" type="text" maxlength="20" minlength="2" class="form-control" id="name"
+          value="{{turmaEditar.descricao}}" oninput="descValidate()" required>
+      </div>
+      <button type="submit" value="submit" class="btn btn-primary mb-2">Gravar Turma</button>
+    </form>
+  </div>
+  <span id="spann" class="span-required">Descrição deve ter pelo menos 2 caracteres</span>
+</div>
+
+<script>
+  const form = document.getElementById('form');
+  const campo = document.querySelector('#name');
+  const sapns = document.querySelector('#spann');
+
+  function descValidate() {
+    if (campo.value.length < 2) {
+      setError();
+    } else {
+      removeError();
+    }
+  }
+
+  function setError() {
+    campo.style.outline = "none";
+    campo.style.border = "2px solid red";
+    sapns.style.display = "block";
+    campo.style.boxShadow = "none";
+  }
+
+  function removeError() {
+    campo.style.outline = "none";
+    campo.style.border = "";
+    sapns.style.display = "none";
+    campo.style.boxShadow = "inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 0 0.25rem rgb(0 123 255 / 25%)";
+  }
+
+
+  $(document).ready(function () {
+    $('#form').submit(function (event) {
+      event.preventDefault();
+      var formData = $(this).serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/editar_turma/{{id}}',
+        data: formData,
+        success: function (response) {
+          if (response[0] === 0) {
+            window.location.href = "{{ url_for('views.turmas') }}";
+          } else {
+            Toastify({
+              text: response[0],
+              duration: 2500,
+              position: "center",
+            }).showToast();
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+</script>
+{%endblock%}

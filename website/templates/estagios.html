@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+  #table-button {
+    width: 25px;
+    text-align: right;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+{% if estagiosData | length == 0 %}
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">Estágios</h1>
+  <div class="d-flex justify-content-center">
+    <p style="color: red; font-size: 17px">Não existem Estágios</p>
+  </div>
+  <a href="{{url_for('views.criar_estagio')}}">
+    <button type="button" class="btn btn-primary">Novo Estágio</button>
+  </a>
+</div>
+{% else %}
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">Estágios</h1>
+</div>
+
+<table id="table" class="table table-sm" align="center" style="width: 900px; max-width: 900px;">
+  <thead>
+    <th style="float: left; border: none; margin-top: 6px">
+      <label for="inputTurma" class="form-label" aria-label="Default select example">Turma:</label>
+      <select id="inputTurma" class="form-select form-select-lg">
+        {% for row in turmasData %}
+        <option value="{{row.id}}">{{row.descricao}}</option>
+        {% endfor %}
+      </select>
+    </th>
+    <th style="float: left; border: none; margin-bottom: 20px; margin-left: 6px;">
+      <a href="/criar_estagio">
+        <button type="button" class="btn btn-primary">Novo Estágio</button>
+      </a>
+    </th>
+  </thead>
+  <thead id="thead1">
+    <tr>
+      <th scope="col">Aluno</th>
+      <th scope="col">Entidade</th>
+      <th scope="col">Data Inicio</th>
+      <th scope="col">Data Fim</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+  <tbody style="border: none; display: none;" id="div1">
+    <tr style="border: none;">
+      <td style="border: none;">
+        <p style="text-align: center; color: red; font-size: 17px">Turma sem estágios</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  $(document).ready(function () {
+    var turmaSelecionada = $("#inputTurma").val();
+    carregar_alunos(turmaSelecionada);
+  });
+
+  $('#inputTurma').on('change', function () {
+    var turmaSelecionada = $(this).val();
+    carregar_alunos(turmaSelecionada);
+  });
+
+  function carregar_alunos(turmaSelecionada) {
+    $.ajax({
+      url: "/get_alunos_estagios",
+      type: "POST",
+      data: JSON.stringify({
+        "turmaSelecionada": turmaSelecionada
+      }),
+      contentType: "application/json",
+      success: function (response) {
+        updateTable(response);
+        const tableBody = document.getElementById("tbody");
+        const div1 = document.getElementById("div1");
+        const thead = document.getElementById("thead1");
+
+        if (tableBody.children.length === 0) {
+          div1.style.display = '';
+          thead.style.display = 'none';
+        } else {
+          thead.style.display = '';
+          div1.style.display = 'none';
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      }
+    });
+  }
+
+  function updateTable(response) {
+    estagios = response;
+    const tableBody = document.getElementById("tbody");
+    const div1 = document.getElementById("div1");
+    if (tableBody) {
+      tableBody.innerHTML = "";
+    }
+    estagios.forEach((aluno) => {
+      let id2 = aluno.estagioId;
+      let id = aluno.id;
+      let url_editar = "{{url_for('views.editar_estagio', id=123)}}".replace("123", id);
+      let textEdit = `
+          </th>
+          <th id="table-button" class="table-button" scope="col">
+            <a href="${url_editar}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+              </svg>
+            </a>
+          </th>`;
+
+      let url_del = "{{url_for('views.eliminar_estagio', id=123)}}".replace("123", id);
+      let textDel = `
+          <th id="table-button" class="table-button" scope="col">
+            <a href="${url_del}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+              </svg>
+            </a>
+          </th>`;
+
+      let url_Dow = "{{url_for('views.documentos', id=123)}}".replace("123", id);
+      let textDownload = `
+          <th id="table-button" class="table-button" scope="col">
+            <a href="${url_Dow}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+              </svg>
+            </a>
+          </th>`;
+
+      const row = tableBody.insertRow(-1);
+      row.insertCell(0).innerHTML = aluno.nome;
+      row.insertCell(1).innerHTML = aluno.entidade;
+      row.insertCell(2).innerHTML = aluno.data_inicio;
+      row.insertCell(3).innerHTML = aluno.data_fim;
+      row.insertCell(4).innerHTML = textEdit;
+      row.insertCell(5).innerHTML = textDel;
+      row.insertCell(6).innerHTML = textDownload;
+    });
+  }
+</script>
+{% endif %}
+
+{% endblock %}

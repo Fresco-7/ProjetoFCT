@@ -1,0 +1,136 @@
+{% extends 'base.html' %} {% block main %}
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">Editar Aluno</h1>
+</div>
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+  <form action="{{url_for('views.editar_aluno', id=id)}}" class="row g-3" style="margin-top: 50xp; width: 600px"
+    id="myForm" method="post">
+    <div class="col-md-11 text-center" style="margin-left: 17px">
+      <label for="inputTurma" class="form-label" aria-label="Default select example">Turma</label>
+      <select name="inputTurma" inid="inputTurma" class="form-select form-select-lg">
+        {% for row in turmasData %}
+        {% if row.id == alunoEditar.turmaId %}
+        <option value="{{row.id}}" selected>{{row.descricao}}</option>
+        {%else%}<option value="{{row.id}}">{{row.descricao}}</option> {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-3">
+      <label class="form-label">Número</label>
+      <input name="numero" type="number" min="1" class="form-control" id="numero" placeholder="Número"
+        value="{{alunoEditar.nr}}" required />
+    </div>
+    <div class="col-9">
+      <label class="form-label">Nome</label>
+      <input name="nome" type="text" class="form-control" id="nome" placeholder="Nome" value="{{alunoEditar.nome}}"
+        required />
+    </div>
+    <div class="col-6" style="margin-top: 5px">
+      <label class="form-label">Morada</label>
+      <input name="morada" type="text" class="form-control" id="morada" placeholder="Rua, Prédio, Andar"
+        value="{{alunoEditar.morada}}" required />
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Cód.Postal</label>
+      <input name="codpostal" maxlength="8" type="text" class="form-control" id="postal-code-input"
+        placeholder="Cod.Postal" value="{{alunoEditar.cod_postal}}" required />
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Localidade</label>
+      <input name="local" type="text" class="form-control" id="localidade" placeholder="Localidade"
+        value="{{localidade}}" required />
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Cartão Cidadão</label>
+      <input name="cc" type="text" maxlength="8" class="form-control" id="cc" value="{{alunoEditar.cartao_cidadao}}"
+        required />
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Nif</label>
+      <input name="nif" maxlength="9" type="text" min="0" class="form-control" id="nif" value="{{alunoEditar.nif}}"
+        required />
+    </div>
+    <div class="col-md-4" style="margin-top: 5px">
+      <label class="form-label">Validade CC</label>
+      <input name="validade" type="date" class="form-control" id="validade" min="2022-01-01"
+        value="{{alunoEditar.validade_cc}}" required />
+    </div>
+    <div class="col-md-2" style="margin-top: 37px; padding-left: 9px">
+      <button type="submit" value="submit" class="btn btn-primary">Gravar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const numeroInput = document.getElementById('numero');
+  numeroInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+
+
+
+  const nifInput = document.getElementById('nif');
+  nifInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+
+  const codigoPostalInput = document.getElementById('postal-code-input');
+  codigoPostalInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const cleanedValue = value.replace(/\D/g, '');
+    let formattedValue = cleanedValue;
+    if (cleanedValue.length > 4) {
+      formattedValue = cleanedValue.slice(0, 4) + '-' + cleanedValue.slice(4);
+    }
+    input.value = formattedValue;
+  });
+
+  const LocalidadeInput = document.getElementById('localidade');
+  LocalidadeInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/[^a-zA-Z\s]/g, '');
+    input.value = newValue;
+  });
+  const cc = document.getElementById('cc');
+  cc.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+
+  $(document).ready(function () {
+    $('#myForm').submit(function (event) {
+      event.preventDefault();
+      var formData = $(this).serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/editar_aluno/{{id}}',
+        data: formData,
+        success: function (response) {
+          if (response[0] === 0) {
+            window.location.href = "{{ url_for('views.alunos') }}";
+          } else {
+            Toastify({
+              text: response[0],
+              duration: 2500,
+              position: "center",
+            }).showToast();
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

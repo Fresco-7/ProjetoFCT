@@ -1,0 +1,515 @@
+{% extends 'base.html' %} {% block main %}
+
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Editar Estágio</h1>
+</div>
+<input type="hidden" name="" id="dataInicoEditar" value="{{estagioEditar.data_inicio}}">
+<input type="hidden" name="" id="dataFimEditar" value="{{estagioEditar.data_fim}}">
+<input type="hidden" id="estagioId" value="{{id}}" style="display: none;">
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+    <form action="{{url_for('views.editar_estagio', id=id)}}" method="post" id="myForm" class="row g-3"
+        style="margin-top: 50xp; width: 600px">
+        <div class="col-md-12 text-center" style="margin-left: 17px">
+            {%if turmasData|length == 0 %}
+            <div>
+                <label for="inputTurma" class="form-label" aria-label="Default select example">Nenhuma Turma encontrada
+                </label><a href="{{url_for('views.criar_turma')}}"><label class="form-label"
+                        aria-label="Default select example">&nbspcrie aqui</label></a>
+            </div>
+            {%else%}
+            <label for="inputTurma" class="form-label" aria-label="Default select example">Turma:
+            </label>
+
+            <select name="turma" id="inputTurma" class="form-select form-select-lg" name="turma">
+                {% for row in turmasData %}
+                {% if row.descricao == nomeTurma %}
+                <option value="{{row.id}}" selected>{{row.descricao}}</option>
+                {%else%}
+                <option value="{{row.id}}">{{row.descricao}}</option>
+                {%endif%}
+                {% endfor %}
+            </select>
+            <div id="msgAluno" style="display: none">
+                <label class="form-label" aria-label="Default select example">Turma sem alunos crie aqui</label><a
+                    href="{{url_for('views.criar_aluno')}}"><label class="form-label"
+                        aria-label="Default select example">&nbspcrie aqui</label></a>
+            </div>
+            <div style="display: inline" id="alunoTudo">
+                <label for="inputAluno" class="form-label" aria-label="Default select example" id="labell">Aluno:
+                </label>
+                <select name="aluno" id="inputAluno" class="form-select form-select-lg">
+                </select>
+            </div>
+            {%endif%} {%if entidadesData|length == 0 %}
+            <div>
+                <label for="inputTurma" class="form-label" aria-label="Default select example">Nenhuma Entidade
+                    encontrada
+                </label><a href="{{url_for('views.criar_entidade')}}"><label class="form-label"
+                        aria-label="Default select example">&nbspcrie aqui</label></a>
+            </div>
+            {%else%}
+            <label for="inputEntidade" class="form-label" aria-label="Default select example">Entidade:
+            </label>
+            <select name="entidade" id="inputEntidade" class="form-select form-select-lg">
+                {% for row in entidadesData %}
+                {% if row.id == estagioEditar.entidadeId %}
+                <option value="{{row.id}}" selected>{{row.nome}}</option>
+                {%else%}
+                <option value="{{row.id}}">{{row.nome}}</option>
+                {%endif%}
+                {% endfor %}
+            </select>
+            {%endif%}
+        </div>
+        <div class=" col-md-4" style="margin-top: 5px">
+            <label class="form-label">Data Inicio:</label>
+            Dia:<select name="inputDia" id="inputDia" class="form-select form-select-lg">
+            </select>
+        </div>
+        <div class="col-md-4" style="margin-top: 5px; float: left;">
+            Mes:<select name="inputMes" id="inputMes" class="form-select form-select-lg">
+            </select>
+        </div>
+        <div class="col-md-3" style="margin-top: 5px; margin-left: 15px;">
+            Ano:<select name="inputAno" id="inputAno" class="form-select form-select-lg">
+            </select>
+        </div>
+        <div class="col-md-4" style="margin-top: 5px;">
+            <label class="form-label">Data Fim:&nbsp&nbsp&nbsp</label>
+            Dia:<select id="inputDiaFim" name="inputDiaFim" class="form-select form-select-lg" disabled></select>
+        </div>
+        <div class="col-md-4" style="margin-top: 5px; float: left;">
+            Mes:<select id="inputMesFim" name="inputMesFim" class="form-select form-select-lg" disabled></select>
+        </div>
+        <div class="col-md-3" style="margin-top: 5px; margin-left: 15px;">
+            Ano:<select id="inputAnoFim" name="inputAnoFim" class="form-select form-select-lg" disabled></select>
+        </div>
+        <div class="col-6" style="margin-top: 5px">
+            <label for="inputOrientador" class="form-label">Orientador</label>
+            <input type="text" class="form-control" id="inputOrientador" name="orientador"
+                value="{{estagioEditar.orientador}}" />
+        </div>
+        <div class="col-6" style="margin-top: 5px">
+            <label for="inputTutor" class="form-label">Tutor</label>
+            <input type="text" class="form-control" id="inputTutor" name="tutor" value="{{estagioEditar.tutor}}" />
+        </div>
+
+        <div class="col-6" style="margin-top: 5px">
+            <label for="inputAddress2" class="form-label">Morada</label>
+            <input name="morada" type="text" class="form-control" id="inputMorada" placeholder="Rua, Prédio, Andar"
+                value="{{estagioEditar.morada}}" />
+        </div>
+        <div class="col-md-3" style="margin-top: 5px">
+            <label for="inputCodPostal" class="form-label">Cód. Postal</label>
+            <input type="text" class="form-control" id="inputCodPostal" name="cod_postal" maxlength="8"
+                value="{{codPostal}}" />
+        </div>
+        <div class="col-md-3" style="margin-top: 5px">
+            <label class="form-label">Localidade</label>
+            <input name="localidade" type="text" class="form-control" id="localidade" placeholder="Localidade"
+                value="{{localidade}}" required />
+        </div>
+        <div class="col-md-10" style="margin-top: 5px">
+            <label for="inputEmailTutor" class="form-label">Email Tutor</label>
+            <input type="text" min="0" class="form-control" id="inputEmailTutor" name="email_tutor"
+                value="{{estagioEditar.email_tutor}}" />
+        </div>
+        <div class="col-md-2" style="margin-top: 37px; padding-left: 11px">
+            <button type="submit" value=" submit" class="btn btn-primary">Gravar</button>
+        </div>
+        <input type="hidden" id="hiddenDia" name="inputDiaFim" value="">
+        <input type="hidden" id="hiddenMes" name="inputMesFim" value="">
+        <input type="hidden" id="hiddenAno" name="inputAnoFim" value="">
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var entidadeSelecionada = $("#inputEntidade").val();
+
+        var turmaSelecionada = $("#inputTurma").val();
+        carregar_alunos(turmaSelecionada);
+        carregar_dias(0, 0, 0);
+        $('#myForm').submit(function (event) {
+            event.preventDefault();
+            let diaSelecionado = $('#inputDiaFim').val();
+            let mesSelecionado = $('#inputMesFim').val();
+            let anoSelecionado = $('#inputAnoFim').val();
+            $('#hiddenDia').val(diaSelecionado);
+            $('#hiddenMes').val(mesSelecionado);
+            $('#hiddenAno').val(anoSelecionado);
+            var formData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: '/editar_estagio/{{id}}',
+                data: formData,
+                success: function (response) {
+                    if (response[0] === 0) {
+                        window.location.href = "{{ url_for('views.estagios') }}";
+                    } else {
+                        Toastify({
+                            text: response[0],
+                            duration: 2500,
+                            position: "center",
+                        }).showToast();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+        atualizarData();
+    });
+
+    $('#inputTurma').on('change', function () {
+        var turmaSelecionada = $(this).val();
+        carregar_alunos(turmaSelecionada)
+    });
+
+
+    function carregar_alunos(turmaSelecionada) {
+        $.ajax({
+            url: "/get_alunos",
+            type: "POST",
+            data: JSON.stringify({
+                "turmaSelecionada": turmaSelecionada,
+                "estagioId": valorInput = $('#estagioId').val()
+
+            }),
+            contentType: "application/json",
+            success: function (response) {
+
+                updateSelect(response);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        })
+
+    };
+
+
+    function carregar_entidade(entidade) {
+        $.ajax({
+            url: "/get_entidade",
+            type: "POST",
+            data: JSON.stringify({
+                "id": entidade
+            }),
+            contentType: "application/json",
+            success: function (response) {
+                updateInputs(response);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        })
+
+    };
+    $('#inputEntidade').on('change', function () {
+        let entidadeSelecionada = $("#inputEntidade").val();
+        carregar_entidade(entidadeSelecionada);
+    });
+
+
+    function updateSelect(response) {
+        alunos = response[0]
+        selectElement = document.getElementById("inputAluno");
+        selectElement.length = 0;
+        alunos.forEach((aluno) => {
+            let optionElement = document.createElement("option");
+            optionElement.value = aluno.id;
+            optionElement.text = aluno.nome_abreviado;
+            selectElement.add(optionElement);
+
+            if (aluno.nome_abreviado === response[1]) {
+                optionElement.selected = true;
+            }
+
+        })
+        if ($('#inputAluno').has('option').length > 0) {
+            $('#inputAluno').show();
+            $('#msgAluno').hide();
+            $("#labell").show();
+            disableEnable(false);
+        } else {
+            $('#inputAluno').hide();
+            $('#msgAluno').show();
+            $("#labell").hide();
+            disableEnable(true);
+            return
+        }
+        if ($('#inputEntidade').has('option').length > 0) {
+            disableEnable(false);
+        } else {
+            disableEnable(true);
+            return
+        }
+        if ($('#inputTurma').has('option').length > 0) {
+            disableEnable(false);
+        } else {
+            disableEnable(true);
+            return
+        }
+
+    }
+
+    function carregar_dias(anoSelecionado, mesSelecionado, opcional) {
+        $.ajax({
+            url: "/get_dia",
+            type: "POST",
+            data: JSON.stringify({
+                "anoSelecionado": anoSelecionado,
+                "mesSelecionado": mesSelecionado
+            }),
+            contentType: "application/json",
+            success: function (response) {
+                document.getElementById("inputDia").innerHTML = "";
+                data = response;
+                if (data["type"] === 0) {
+                    anos = data["Anos"]
+                    meses = data["Meses"]
+                    var valor = $('#dataInicoEditar').val();
+                    let anoInicio = valor.substring(0, 4);
+                    let mesInicio = valor.substring(5, 7);
+                    if (mesInicio.substring(0, 1) === '0') {
+                        mesInicio = mesInicio.substring(1, 2);
+                    }
+                    let diaInicio = valor.substring(8, 10);
+                    dia = parseInt(diaInicio);
+                    mesInicio = parseInt(mesInicio)
+                    ano1 = parseInt(anoInicio);
+                    let selectElement = document.getElementById("inputMes");
+                    let mesess = {
+                        'Janeiro': 1,
+                        'Fevereiro': 2,
+                        'Março': 3,
+                        'Abril': 4,
+                        'Maio': 5,
+                        'Junho': 6,
+                        'Julho': 7,
+                        'Agosto': 8,
+                        'Setembro': 9,
+                        'Outubro': 10,
+                        'Novembro': 11,
+                        'Dezembro': 12
+                    };
+                    let mes1;
+                    Object.entries(mesess).forEach(([mes, valor]) => {
+                        if (valor === mesInicio) {
+                            mes1 = mes;
+                        }
+                    });
+
+                    meses.forEach((mes) => {
+                        let option = document.createElement("option");
+                        option.text = mes;
+                        option.value = mes;
+                        if (mes === mes1) {
+                            option.selected = true;
+                        }
+                        selectElement.add(option);
+                    })
+                    selectElement = document.getElementById("inputAno");
+                    anos.forEach((ano) => {
+                        let option = document.createElement("option");
+                        option.text = ano;
+                        option.value = ano;
+                        if (ano === ano1) {
+                            option.selected = true;
+                        }
+                        selectElement.add(option);
+                    })
+                    carregar_dias(ano1, mes1, dia);
+                    let diaSelecionado = $('#inputDia').val();
+                    let mesSelecionado = $('#inputMes').val();
+                    let anoSelecionado = $('#inputAno').val();
+                    updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado)
+                } else {
+
+                    dias = data[0]
+                    if (opcional === 0) {
+                        dia_atual = data[1];
+                    } else {
+                        dia_atual = opcional;
+                    }
+                    selectElement = document.getElementById("inputDia");
+
+                    if (dias !== undefined) {
+                        dias.forEach((dia) => {
+                            let option = document.createElement("option");
+                            option.text = dia;
+                            option.value = dia;
+                            if (dia === dia_atual) {
+                                option.selected = true;
+                            }
+                            selectElement.add(option);
+                        });
+                    }
+                    let diaSelecionado = $('#inputDia').val();
+                    let mesSelecionado = $('#inputMes').val();
+                    let anoSelecionado = $('#inputAno').val();
+                    updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado)
+                }
+
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
+    $('#inputMes').on('change', function () {
+        let mesSelecionado = $(this).val();
+        let anoSelecionado = $('#inputAno').val();
+        let diaSelecionado = $('#inputDia').val();
+        carregar_dias(anoSelecionado, mesSelecionado, 0)
+        updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado)
+
+    });
+    $('#inputAno').on('change', function () {
+        let anoSelecionado = $(this).val();
+        let mesSelecionado = $('#inputMes').val();
+        let diaSelecionado = $('#inputDia').val();
+        carregar_dias(anoSelecionado, mesSelecionado, 0)
+        updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado)
+
+    });
+    $('#inputDia').on('change', function () {
+        let diaSelecionado = $(this).val();
+        let mesSelecionado = $('#inputMes').val();
+        let anoSelecionado = $('#inputAno').val();
+        updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado)
+    });
+
+    function adicionarDiasUteis(dataInicial, quantidadeDias) {
+        var data = new Date(dataInicial);
+        var diasAdicionados = 0;
+
+        while (diasAdicionados < quantidadeDias) {
+            data.setDate(data.getDate() + 1);
+
+            if (data.getDay() !== 0 && data.getDay() !== 6) {
+                diasAdicionados++;
+            }
+        }
+
+        return data;
+    }
+
+    function atualizarData() {
+        var valor = $('#dataInicoEditar').val();
+        let anoInicio = valor.substring(0, 4);
+        let mesInicio = valor.substring(5, 7);
+        let diaInicio = valor.substring(8, 10);
+        diaInicio = parseInt(diaInicio);
+        anoInicio = parseInt(anoInicio);
+        let selectDia = $('#inputDia');
+        let selectAno = $('#inputAno');
+    }
+
+
+    function updateDataFim(anoSelecionado, mesSelecionado, diaSelecionado) {
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro',
+            'Outubro', 'Novembro', 'Dezembro'
+        ];
+        const mesAtual = meses.indexOf(mesSelecionado) + 1;
+        const dataInicial = new Date(`${anoSelecionado}-${mesAtual}-${diaSelecionado}`);
+
+        var dataFinal = adicionarDiasUteis(dataInicial, 64);
+        let mes = dataFinal.getMonth();
+        mes = meses[mes];
+        let dia = dataFinal.getDate();
+        let ano = dataFinal.getFullYear();
+        let mesSelecionadoFim = document.getElementById("inputMesFim");
+        let anoSelecionadoFim = document.getElementById("inputAnoFim");
+        let diaSelecionadoFim = document.getElementById("inputDiaFim");
+        let option = document.createElement("option");
+        option.text = mes;
+        option.value = mes;
+        option.selected = true;
+        mesSelecionadoFim.add(option);
+
+        option = document.createElement("option");
+        option.text = ano;
+        option.value = ano;
+        option.selected = true;
+        anoSelecionadoFim.add(option);
+
+        option = document.createElement("option");
+        option.text = dia;
+        option.value = dia;
+        option.selected = true;
+        diaSelecionadoFim.add(option);
+
+    }
+
+
+
+
+
+
+
+    const localidade = document.getElementById('localidade');
+    localidade.addEventListener('input', function (event) {
+        const input = event.target;
+        const value = input.value;
+        const newValue = value.replace(/[^a-zA-Z\s]/g, '');
+        input.value = newValue;
+    })
+
+    const inputCodPostal = document.getElementById('inputCodPostal');
+    inputCodPostal.addEventListener('input', function (event) {
+        const input = event.target;
+        const value = input.value;
+        const cleanedValue = value.replace(/\D/g, '');
+        let formattedValue = cleanedValue;
+        if (cleanedValue.length > 4) {
+            formattedValue = cleanedValue.slice(0, 4) + '-' + cleanedValue.slice(4);
+        }
+        input.value = formattedValue;
+    });
+
+    function disableEnable(value) {
+        var elementos = $('#myForm :input');
+
+        elementos.each(function () {
+            var elementId = $(this).attr('id');
+            if (elementId !== 'inputTurma' && elementId !== 'inputAluno' && elementId !== 'inputEntidade') {
+                $(this).prop('disabled', value);
+            }
+        });
+        $("#inputDiaFim").prop('disabled', true);
+        $("#inputMesFim").prop('disabled', true);
+        $("#inputAnoFim").prop('disabled', true);
+
+    }
+
+    function carregar_entidade(entidade) {
+        $.ajax({
+            url: "/get_entidade",
+            type: "POST",
+            data: JSON.stringify({
+                "id": entidade
+            }),
+            contentType: "application/json",
+            success: function (response) {
+                updateInputs(response);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        })
+
+    };
+
+    function updateInputs(response) {
+        let elemento = document.getElementById("inputMorada");
+        elemento.value = response['Morada'];
+        elemento = document.getElementById("inputCodPostal");
+        elemento.value = response['codPostal'];
+        elemento = document.getElementById("localidade");
+        elemento.value = response['localidade'];
+    }
+</script>
+{%endblock%}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block main %}
+{% if turmasData %}
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">Criar Aluno</h1>
+</div>
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+  <form action="{{url_for('views.criar_aluno')}}" class="row g-3" style="margin-top: 50px; width: 600px" id="myForm"
+    method="post">
+    <div class="col-md-11 text-center" style="margin-left: 17px">
+      <label for="inputTurma" class="form-label" aria-label="Default select example">Turma</label>
+      <select name="inputTurma" id="inputTurma" class="form-select form-select-lg">
+        {% for row in turmasData %}
+        <option>{{ row.descricao }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-3">
+      <label class="form-label">Número</label>
+      <input name="numero" type="number" min="1" class="form-control" id="numero" placeholder="Número" required>
+    </div>
+    <div class="col-9">
+      <label class="form-label">Nome</label>
+      <input name="nome" type="text" class="form-control" id="nome" placeholder="Nome" required>
+    </div>
+    <div class="col-6" style="margin-top: 5px">
+      <label class="form-label">Morada</label>
+      <input name="morada" type="text" class="form-control" id="morada" placeholder="Rua, Prédio, Andar" required>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Cód.Postal</label>
+      <input name="codpostal" maxlength="8" type="text" class="form-control" id="postal-code-input"
+        placeholder="Cod.Postal" required>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Localidade</label>
+      <input name="local" type="text" class="form-control" id="localidade" placeholder="Localidade" required>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Cartão Cidadão</label>
+      <input name="cc" type="text" maxlength="8" class=" form-control" id="cc" required>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label class="form-label">Nif</label>
+      <input name="nif" maxlength="9" type="text" min="0" class="form-control" id="nif" required>
+    </div>
+    <div class="col-md-4" style="margin-top: 5px">
+      <label class="form-label">Validade CC</label>
+      <input name="validade" type="date" class="form-control" id="validade" required>
+    </div>
+    <div class="col-md-2" style="margin-top: 37px; padding-left: 9px">
+      <button type="submit" value="submit" class="btn btn-primary">Gravar</button>
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+  <form class="row g-3" style="margin-top: 50px; width: 600px">
+    <div class="col-md-11 text-center" style="margin-left: 17px">
+      <label for="inputTurma" class="form-label" aria-label="Default select example">Nenhuma turma encontrada</label>
+      <a href="{{url_for('views.criar_turma')}}">
+        <label for="inputTurma" class="form-label" aria-label="Default select example">crie aqui</label>
+      </a>
+    </div>
+    <div class="col-2">
+      <label for="inputNumero" class="form-label">Número</label>
+      <input name="numero" type="text" min="1" class="form-control" id="inputNumero" disabled>
+    </div>
+    <div class="col-5">
+      <label for="inputNome" class="form-label">Nome</label>
+      <input name="nome" type="text" class="form-control" id="inputNome" disabled>
+    </div>
+    <div class="col-9" style="margin-top: 5px">
+      <label for="inputAddress2" class="form-label">Morada</label>
+      <input name="morada" type="text" class="form-control" id="inputAddress2" placeholder="Rua, Prédio, Andar"
+        disabled>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label for="inputCodPostal" class="form-label">Cód.Postal</label>
+      <input name="codpostal" type="text" class="form-control" id="inputCodPostal" disabled>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label for="inputCC" class="form-label">Cartão Cidadão</label>
+      <input name="cc" type="text" min="000000000" class="form-control" id="inputCC" disabled>
+    </div>
+    <div class="col-md-3" style="margin-top: 5px">
+      <label for="inputNif" class="form-label">Nif</label>
+      <input name="nif" type="text" min="0" class="form-control" id="inputNif" disabled>
+    </div>
+    <div class="col-md-4" style="margin-top: 5px">
+      <label for="inputValidade" class="form-label">Validade CC</label>
+      <input name="validade" type="date" class="form-control" id="inputValidade" disabled>
+    </div>
+    <div class="col-md-2" style="margin-top: 37px; padding-left: 9px">
+      <button type="submit" value="submit" class="btn btn-primary">Gravar</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<script>
+  $(document).ready(function () {
+    $('#myForm').submit(function (event) {
+      event.preventDefault();
+      var formData = $(this).serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/criar_aluno',
+        data: formData,
+        success: function (response) {
+          if (response[0] === 0) {
+            window.location.href = "{{ url_for('views.alunos') }}";
+          } else {
+            Toastify({
+              text: response[0],
+              duration: 2500,
+              position: "center",
+            }).showToast();
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+  const numeroInput = document.getElementById('numero');
+  numeroInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+
+
+
+  const nifInput = document.getElementById('nif');
+  nifInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+  const codigoPostalInput = document.getElementById('postal-code-input');
+  codigoPostalInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const cleanedValue = value.replace(/\D/g, '');
+    let formattedValue = cleanedValue;
+    if (cleanedValue.length > 4) {
+      formattedValue = cleanedValue.slice(0, 4) + '-' + cleanedValue.slice(4);
+    }
+    input.value = formattedValue;
+  });
+
+  const LocalidadeInput = document.getElementById('localidade');
+  LocalidadeInput.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/[^a-zA-Z\s]/g, '');
+    input.value = newValue;
+  })
+
+  const cc = document.getElementById('cc');
+  cc.addEventListener('input', function (event) {
+    const input = event.target;
+    const value = input.value;
+    const newValue = value.replace(/\D/g, '');
+    input.value = newValue;
+  });
+</script>
+
+
+
+{% endblock %}
